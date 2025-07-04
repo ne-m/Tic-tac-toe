@@ -1,12 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac ToeS</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="output.css" />
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+  </head>
+  <body
+    class="bg-gradient-to-br from-blue-400 to-green-500 transition-all duration-500"
+  >
+    <!-- Theme Switcher Button -->
+    <button
+      id="themeBtn"
+      class="fixed top-4 right-4 z-50 p-2 bg-white/80 rounded-full shadow-lg hover:scale-105 transition"
+    >
+      🎨
+    </button>
+    <main class="container  bg-white/30 backdrop-blur-md border border-white/20 shadow-2xl">
+      <!-- Game Title -->
+      <header>
+        <h1
+          class="text-4xl font-extrabold text-center mb-8 text-gray-800 tracking-tight"
+        >
+          Tic Tac Toe
+        </h1>
+      </header>
+
+      <!-- Game Mode Selection -->
+      <section aria-labelledby="gameModeLabel" class="mb-8">
+        <label
+          id="gameModeLabel"
+          class="block text-lg font-semibold text-gray-700 mb-3"
+          >Game Mode</label
+        >
+        <select
+          id="gameMode"
+          class="w-full p-3 border rounded-xl bg-gray-50 text-gray-800 focus:ring-2 focus:ring-indigo-500 transition duration-200"
+        >
+          <option value="pvp">Player vs Player</option>
+          <option value="pvc">Player vs Computer</option>
+        </select>
+      </section>
+
+      <!-- Game Status -->
+      <section aria-live="polite" class="text-center mb-8">
+        <p id="status"></p>
+      </section>
+
+      <!-- Game Board -->
+      <section
+        id="board"
+        class="grid grid-cols-3 gap-4 mb-8"
+        aria-label="Tic Tac Toe Board"
+      >
+        <div class="box" id="1" role="button" aria-label="Cell 1"></div>
+        <div class="box" id="2" role="button" aria-label="Cell 2"></div>
+        <div class="box" id="3" role="button" aria-label="Cell 3"></div>
+        <div class="box" id="4" role="button" aria-label="Cell 4"></div>
+        <div class="box" id="5" role="button" aria-label="Cell 5"></div>
+        <div class="box" id="6" role="button" aria-label="Cell 6"></div>
+        <div class="box" id="7" role="button" aria-label="Cell 7"></div>
+        <div class="box" id="8" role="button" aria-label="Cell 8"></div>
+        <div class="box" id="9" role="button" aria-label="Cell 9"></div>
+      </section>
+
+      <!-- Scoreboard -->
+      <aside
+        id="dashboard"
+        class="mb-8 p-6 rounded-xl bg-white shadow-2xl border border-gray-200"
+        aria-labelledby="scoreboardTitle"
+      >
+        <h2
+          id="scoreboardTitle"
+          class="text-2xl font-bold text-gray-700 mb-6 flex items-center gap-2"
+        >
+          <!-- You can keep or remove the icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6 text-yellow-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8c.637 0 1.25.25 1.707.707C14.25 9.25 14.5 9.863 14.5 10.5s-.25 1.25-.793 1.793C13.25 12.75 12.637 13 12 13s-1.25-.25-1.707-.707C9.75 11.75 9.5 11.137 9.5 10.5s.25-1.25.793-1.793C10.75 8.25 11.363 8 12 8z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 14v6m0 0l-3-3m3 3l3-3"
+            />
+          </svg>
+          Scoreboard
+        </h2>
+
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+          <!-- Player 1 -->
+          <article
+            id="p1Card"
+            class="bg-red-100 border-2 border-red-300 rounded-xl p-4 transition hover:scale-105"
+            aria-label="Player 1 Score"
+          >
+            <h3 class="text-lg font-semibold text-red-700 mb-2">Player 1</h3>
+            <p id="p1Wins" class="text-3xl font-bold text-red-600">0</p>
+          </article>
+
+          <!-- Draws -->
+          <article
+            id="drawsCard"
+            class="bg-gray-100 border-2 border-gray-300 rounded-xl p-4 transition hover:scale-105"
+            aria-label="Draws"
+          >
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Draws</h3>
+            <p id="draws" class="text-3xl font-bold text-gray-800">0</p>
+          </article>
+
+          <!-- Player 2 -->
+          <article
+            id="p2Card"
+            class="bg-blue-100 border-2 border-blue-300 rounded-xl p-4 transition hover:scale-105"
+            aria-label="Player 2 Score"
+          >
+            <h3 class="text-lg font-semibold text-blue-700 mb-2">
+              Player 2 / AI
+            </h3>
+            <p id="p2Wins" class="text-3xl font-bold text-blue-600">0</p>
+          </article>
+        </section>
+      </aside>
+
+      <!-- Controls -->
+      <nav class="flex justify-center gap-6" aria-label="Game Controls">
+        <!-- Restart Button -->
+        <div class="relative group">
+          <button id="restart" class="bg-red-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-600">
+            Restart Game
+          </button>
+          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded">
+            Start over from scratch
+          </span>
+        </div>
+
+        <!-- New Round Button -->
+        <div class="relative group">
+          <button id="newRound" class="bg-green-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600" disabled>
+            New Round
+          </button>
+          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded">
+            Continue playing next round
+          </span>
+        </div>
+      </nav>
+    </main>
+
+    <!-- Audio preload-->
+    <audio id="winSound" src="sounds/win.wav" preload="auto"></audio>
+    <audio id="errorSound" src="sounds/error.mp3" preload="auto"></audio>
+
+
+    <script src="script.js"></script>
+    <!--Confetti script-->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  </body>
 </html>
