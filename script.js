@@ -85,7 +85,7 @@ function celebrateWin() {
 }
 
 // Load sounds
-const winSound = new Audio('sounds/win.mp3');
+const winSound = new Audio('sounds/win.wav');
 const errorSound = new Audio('sounds/error.mp3');
 
 // Optional: Set volume
