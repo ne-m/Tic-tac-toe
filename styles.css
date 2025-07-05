@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+    background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+}
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 450px;
+    width: 100%;
+}
+.box {
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #1e293b;
+    background: #f8fafc;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e2e8f0;
+}
+.box:hover:not(.disabled) {
+    transform: translateY(-5px) scale(1.05);
+    background: #dbeafe;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+.box.x {
+    color: #dc2626;
+    text-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+}
+.box.o {
+    color: #2563eb;
+    text-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+}
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+#status {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    animation: fadeIn 0.5s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.win-animation {
+    animation: winGlow 1.2s ease-in-out infinite;
+}
+@keyframes winGlow {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+    50% { transform: scale(1.08); box-shadow: 0 0 20px rgba(255, 255, 255, 1); }
+    100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+}
+button {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+button:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+#dashboard {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    transition: all 0.3s ease;
+}
+#dashboard p {
+    animation: slideIn 0.5s ease-in;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulseOnce {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pulse-once {
+  animation: pulseOnce 0.4s ease-in-out;
+}
+
