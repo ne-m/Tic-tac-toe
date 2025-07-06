@@ -14,6 +14,7 @@ const draws = document.getElementById('draws');
 
 const restartBtn = document.getElementById('restart');
 const newRoundBtn = document.getElementById('newRound');
+const forfeitBtn = document.getElementById("forfeit");
 
 const errorSound = document.getElementById('errorSound');
 const winSound = document.getElementById('winSound');
@@ -34,6 +35,7 @@ loadScores()
 
 restartBtn.addEventListener('click', resetGame)
 newRoundBtn.addEventListener('click', newRound)
+forfeitBtn.addEventListener("click", forfeitGame);
 
 gameModeSelect.addEventListener("change", (e) => {
   gameMode = e.target.value;
@@ -170,10 +172,8 @@ function computerMove() {
   handleMove(randomIndex);
 }
 
-function endGame(winner){
+function endGame(winner, wasForfeit = false){
     gameActive = false
-
-
     // const status = document.getElementById('status');
 
     // Reset styles
@@ -186,15 +186,15 @@ function endGame(winner){
     // Highlight winner
     if (winner === 'X') {
         p1Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
-        statusText.innerText = '🎉 Player 1 Wins!';
+        statusText.innerText = wasForfeit? "🔴 Player 1 Wins by Forfeit!": '🎉 Player 1 Wins!';
         statusText.classList.add('text-red-600', 'animate-pulse-once');
     } else if (winner === 'O') {
         p2Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
-        statusText.innerText = '🎉 Player 2 Wins!';
+        statusText.innerText = wasForfeit ? '🔵 Player 2 Wins by Forfeit!' : '🎉 Player 2 Wins!';
         statusText.classList.add('text-blue-600', 'animate-pulse-once');
     } else {
         drawsCard.classList.add('ring-4', 'ring-yellow-400', 'animate-pulse-once');
-        statusText.innerText = '🤝 It\'s a draw!';
+        statusText.innerText = wasForfeit ? 'Computer wins by Forfeit?' : '🤝 It\'s a draw!';
         statusText.classList.add('text-gray-600', 'animate-pulse-once');
     }
 
@@ -264,6 +264,17 @@ function newRound() {
     showCurrentTurn()
     newRoundBtn.disabled = true // the new round button gets disabled after a new round is stared and when the game is midway
 }
+
+function forfeitGame(){
+  if (!gameActive) return;
+
+  const confirmation = confirm("Are you sure you want to forfeit the match?");
+  if (!confirmation) return;
+
+  const opponent = currentPlayer === "X" ? "O" : "X";
+  endGame(opponent, true); // true = was a forfeit
+}
+
 
 function resetStyles() {
   [p1Card, p2Card, drawsCard].forEach(card => {

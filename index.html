@@ -22,7 +22,7 @@
     >
       🎨
     </button>
-    <main class="container  bg-white/30 backdrop-blur-md border border-white/20 shadow-2xl">
+    <main class="container  bg-white/30 backdrop-blur-md border border-white/20 shadow-2xl sm:w-2/3 md:w-2/3">
       <!-- Game Title -->
       <header>
         <h1
@@ -56,18 +56,18 @@
       <!-- Game Board -->
       <section
         id="board"
-        class="grid grid-cols-3 gap-4 mb-8"
+        class="grid grid-cols-3 gap-3 mb-8"
         aria-label="Tic Tac Toe Board"
       >
-        <div class="box" id="1" role="button" aria-label="Cell 1"></div>
-        <div class="box" id="2" role="button" aria-label="Cell 2"></div>
-        <div class="box" id="3" role="button" aria-label="Cell 3"></div>
-        <div class="box" id="4" role="button" aria-label="Cell 4"></div>
-        <div class="box" id="5" role="button" aria-label="Cell 5"></div>
-        <div class="box" id="6" role="button" aria-label="Cell 6"></div>
-        <div class="box" id="7" role="button" aria-label="Cell 7"></div>
-        <div class="box" id="8" role="button" aria-label="Cell 8"></div>
-        <div class="box" id="9" role="button" aria-label="Cell 9"></div>
+        <div class="box mx-auto" id="1" role="button" aria-label="Cell 1"></div>
+        <div class="box mx-auto" id="2" role="button" aria-label="Cell 2"></div>
+        <div class="box mx-auto" id="3" role="button" aria-label="Cell 3"></div>
+        <div class="box mx-auto" id="4" role="button" aria-label="Cell 4"></div>
+        <div class="box mx-auto" id="5" role="button" aria-label="Cell 5"></div>
+        <div class="box mx-auto" id="6" role="button" aria-label="Cell 6"></div>
+        <div class="box mx-auto" id="7" role="button" aria-label="Cell 7"></div>
+        <div class="box mx-auto" id="8" role="button" aria-label="Cell 8"></div>
+        <div class="box mx-auto" id="9" role="button" aria-label="Cell 9"></div>
       </section>
 
       <!-- Scoreboard -->
@@ -104,7 +104,7 @@
           Scoreboard
         </h2>
 
-        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
           <!-- Player 1 -->
           <article
             id="p1Card"
@@ -140,7 +140,7 @@
       </aside>
 
       <!-- Controls -->
-      <nav class="flex justify-center gap-6" aria-label="Game Controls">
+      <nav class="flex justify-center items-center flex-col md:flex-row gap-6" aria-label="Game Controls">
         <!-- Restart Button -->
         <div class="relative group">
           <button id="restart" class="bg-red-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-600">
@@ -159,6 +159,15 @@
           <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded">
             Continue playing next round
           </span>
+        </div>
+
+        <div class="relative group">
+          <button id="forfeit" class="bg-yellow-400 text-white px-8 py-3 rounded-xl font-semibold hover:bg-yellow-500">
+            Forfeit Game
+          </button>
+          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded">
+            Forfeit game
+          </span>          
         </div>
       </nav>
     </main>
