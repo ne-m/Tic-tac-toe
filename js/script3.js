@@ -16,6 +16,10 @@ const restartBtn = document.getElementById('restart');
 const newRoundBtn = document.getElementById('newRound');
 const forfeitBtn = document.getElementById("forfeit");
 
+const forfeitModal = document.getElementById("forfeitModal");
+const confirmForfeit = document.getElementById("confirmForfeit");
+const cancelForfeit = document.getElementById("cancelForfeit");
+
 const errorSound = document.getElementById('errorSound');
 const winSound = document.getElementById('winSound');
 
@@ -35,7 +39,6 @@ loadScores()
 
 restartBtn.addEventListener('click', resetGame)
 newRoundBtn.addEventListener('click', newRound)
-forfeitBtn.addEventListener("click", forfeitGame);
 
 gameModeSelect.addEventListener("change", (e) => {
   gameMode = e.target.value;
@@ -265,15 +268,24 @@ function newRound() {
     newRoundBtn.disabled = true // the new round button gets disabled after a new round is stared and when the game is midway
 }
 
-function forfeitGame(){
+// Show modal when forfeit button is clicked
+forfeitBtn.addEventListener("click", () => {
   if (!gameActive) return;
+  forfeitModal.classList.remove("hidden");
+});
 
-  const confirmation = confirm("Are you sure you want to forfeit the match?");
-  if (!confirmation) return;
-
+// Confirm forfeit
+confirmForfeit.addEventListener("click", () => {
   const opponent = currentPlayer === "X" ? "O" : "X";
-  endGame(opponent, true); // true = was a forfeit
-}
+  forfeitModal.classList.add("hidden");
+  endGame(opponent, true); // true = forfeit
+});
+
+// Cancel forfeit
+cancelForfeit.addEventListener("click", () => {
+  forfeitModal.classList.add("hidden");
+});
+
 
 
 function resetStyles() {
