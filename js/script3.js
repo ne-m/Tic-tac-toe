@@ -15,6 +15,7 @@ const draws = document.getElementById('draws');
 const restartBtn = document.getElementById('restart');
 const newRoundBtn = document.getElementById('newRound');
 const forfeitBtn = document.getElementById("forfeit");
+const replayRoundBtn = document.getElementById("replayRound")
 
 const forfeitModal = document.getElementById("forfeitModal");
 const confirmForfeit = document.getElementById("confirmForfeit");
@@ -28,6 +29,9 @@ let currentPlayer = "X";
 let gameMode = gameModeSelect.value;
 let gameActive = true;
 let winner = "";
+let moveHistory = []
+console.log(moveHistory);
+
 
 let score = JSON.parse(localStorage.getItem("scores")) || {
   X: 0,
@@ -39,10 +43,11 @@ loadScores()
 
 restartBtn.addEventListener('click', resetGame)
 newRoundBtn.addEventListener('click', newRound)
+replayRoundBtn.addEventListener("click", replayRound)
 
 gameModeSelect.addEventListener("change", (e) => {
   gameMode = e.target.value;
-//   resetGame();
+  resetGame();
 });
 
 // newRoundBtn.style.cursor = newRoundBtn.disabled === true ? "not-allowed" : "pointer"
@@ -64,6 +69,7 @@ function handleMove(index){
 
     board[index] = currentPlayer;
     updateBoard();
+    moveHistory.push({player: currentPlayer, index: index})
 
     winner = checkWin()
 
@@ -85,6 +91,7 @@ function handleMove(index){
     if (gameMode === "pvc" && currentPlayer === "O") {
         setTimeout(computerMove, 500); // Delay to mimic thinking
     }
+    console.log(moveHistory)
 } 
 
 function updateBoard() {
@@ -191,13 +198,17 @@ function endGame(winner, wasForfeit = false){
         p1Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
         statusText.innerText = wasForfeit? "🔴 Player 1 Wins by Forfeit!": '🎉 Player 1 Wins!';
         statusText.classList.add('text-red-600', 'animate-pulse-once');
-    } else if (winner === 'O') {
+    } else if (winner === 'O' && gameMode === 'pvp') {
         p2Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
         statusText.innerText = wasForfeit ? '🔵 Player 2 Wins by Forfeit!' : '🎉 Player 2 Wins!';
         statusText.classList.add('text-blue-600', 'animate-pulse-once');
-    } else {
+    } else if (winner === 'O' && gameMode === 'pvc'){
+        p2Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
+        statusText.innerText = wasForfeit ? '🔵 Computer wins by Forfeit' : '🎉 Computer wins!';
+        statusText.classList.add('text-gray-600', 'animate-pulse-once');
+    } else{
         drawsCard.classList.add('ring-4', 'ring-yellow-400', 'animate-pulse-once');
-        statusText.innerText = wasForfeit ? 'Computer wins by Forfeit?' : '🤝 It\'s a draw!';
+        statusText.innerText = '🤝 It\'s a draw!';
         statusText.classList.add('text-gray-600', 'animate-pulse-once');
     }
 
@@ -223,7 +234,9 @@ function endGame(winner, wasForfeit = false){
     }
 
     saveToLocalStorage()
+    saveHistoryToLocalStorage()
     newRoundBtn.disabled = false
+    replayRoundBtn.disabled = false
 }
 
 function saveToLocalStorage() {
@@ -237,6 +250,7 @@ function loadScores() {
 }
 
 function resetGame(){
+    moveHistory=[]
     score.X = 0;
     score.O = 0;
     score.Draw = 0;
@@ -249,14 +263,19 @@ function resetGame(){
 
     board.fill("")
     gameActive = true
+    currentPlayer = "X"
+
 
     resetStyles()
     updateBoard()
+    showCurrentTurn()
     newRoundBtn.disabled = true
+    replayRoundBtn.disabled = true
 }
 
 function newRound() {
     // console.log("new round");
+    moveHistory = []
     
     board.fill("")
     gameActive = true
@@ -266,6 +285,43 @@ function newRound() {
     updateBoard()
     showCurrentTurn()
     newRoundBtn.disabled = true // the new round button gets disabled after a new round is stared and when the game is midway
+    replayRoundBtn.disabled = true
+}
+
+function saveHistoryToLocalStorage() {
+    localStorage.setItem("lastRound", JSON.stringify({winner, moves: moveHistory}))
+}
+
+function replayRound() {
+    const lastRound = JSON.parse(localStorage.getItem("lastRound"));
+    if (!lastRound || !lastRound.moves) return;
+
+    // Reset board visually
+    board = Array(9).fill("");
+    updateBoard();
+    gameActive = false;
+    statusText.textContent = "🔁 Replaying last round...";
+    replayRoundBtn.disabled = true;
+
+    let delay = 0;
+
+    lastRound.moves.forEach((move, i) => {
+    setTimeout(() => {
+        board[move.index] = move.player;
+        updateBoard();
+
+        if (i === lastRound.moves.length - 1) {
+        // After last move
+        statusText.textContent =
+            lastRound.winner === ""
+            ? "🤝 It was a draw!"
+            : `🏆 ${lastRound.winner === "X" ? "Player 1" : "Player 2"} won!`;
+        }
+    }, delay);
+    delay += 600; // Adjust speed
+    });
+
+    replayRoundBtn.disabled = false
 }
 
 // Show modal when forfeit button is clicked

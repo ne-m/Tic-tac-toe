@@ -140,13 +140,13 @@
       </aside>
 
       <!-- Controls -->
-      <nav class="flex justify-center items-center flex-col md:flex-row gap-6" aria-label="Game Controls">
+      <nav class="flex justify-center items-center flex-row flex-wrap gap-6" aria-label="Game Controls">
         <!-- Restart Button -->
         <div class="relative group">
           <button id="restart" class="bg-red-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-600">
             Restart Game
           </button>
-          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded">
+          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded z-10">
             Start over from scratch
           </span>
         </div>
@@ -156,7 +156,7 @@
           <button id="newRound" class="bg-green-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600" disabled>
             New Round
           </button>
-          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded">
+          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded z-10">
             Continue playing next round
           </span>
         </div>
@@ -165,8 +165,17 @@
           <button id="forfeit" class="bg-yellow-400 text-white px-8 py-3 rounded-xl font-semibold hover:bg-yellow-500">
             Forfeit Game
           </button>
-          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded">
+          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded z-10">
             Forfeit game
+          </span>          
+        </div>
+
+        <div class="relative group">
+          <button id="replayRound" class="bg-blue-400 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-500" disabled>
+            Replay last Round
+          </button>
+          <span class="absolute hidden group-hover:block top-full mt-2 text-sm bg-black text-white px-2 py-1 rounded z-10">
+            Replay last Round
           </span>          
         </div>
       </nav>
