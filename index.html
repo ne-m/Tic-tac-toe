@@ -46,17 +46,46 @@
           <option value="pvp">Player vs Player</option>
           <option value="pvc">Player vs Computer</option>
         </select>
+
+        <!-- Username input section -->
+        <div id="usernameSection" class="space-y-3 text-gray-700">
+          <p class="block text-lg font-semibold text-gray-700 mt-4">Enter username to start</p>
+
+          <input id="player1" type="text" placeholder="Player 1 Name"
+            class="w-full px-4 py-2 bg-white/70 text-gray-700 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 transition" />
+
+          <input id="player2" type="text" placeholder="Player 2 Name"
+            class="w-full px-4 py-2 bg-white/70 text-gray-700 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 transition" />
+        </div>
       </section>
+
+      <!-- Avatar display -->
+      <div id="playerDisplay" class="flex justify-around items-center text-gray-800 mb-4">
+        <div class="flex flex-col items-center gap-1">
+          <img id="avatarX" src="https://api.dicebear.com/9.x/thumbs/svg?flip=true" alt="Player X" class="w-16 h-16 rounded-full shadow-md object-cover border border-gray-300" />
+          <p id="nameX" class="text-sm font-semibold">Player 1</p>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <img id="avatarO" src="https://api.dicebear.com/9.x/thumbs/svg?flip=false" alt="Player O" class="w-16 h-16 rounded-full shadow-md object-cover border border-gray-300" />
+          <p id="nameO" class="text-sm font-semibold">Player 2</p>
+        </div>
+      </div>
+
 
       <!-- Game Status -->
       <section aria-live="polite" class="text-center mb-8">
         <p id="status"></p>
       </section>
 
+            <!-- Countdown bar container -->
+      <div id="countdownBarContainer" class="h-2 w-full max-w-xs mx-auto bg-gray-300 rounded overflow-hidden hidden">
+        <div id="countdownBar" class="h-full bg-purple-500 transition-all duration-1000"></div>
+      </div>
+
       <!-- Game Board -->
       <section
         id="board"
-        class="grid grid-cols-3 gap-3 mb-8"
+        class="grid grid-cols-3 gap-3 max-w-[360px] mx-auto pb-5"
         aria-label="Tic Tac Toe Board"
       >
         <div class="box mx-auto" id="1" role="button" aria-label="Cell 1"></div>
@@ -170,6 +199,7 @@
           </span>          
         </div>
 
+        <!-- Replay last round button -->
         <div class="relative group">
           <button id="replayRound" class="bg-blue-400 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-500" disabled>
             Replay last Round
@@ -198,6 +228,37 @@
       </div>
     </div>
 
+        <!-- Floating Settings Button -->
+    <button id="openSettingsBtn" class="fixed bottom-4 left-4 bg-white shadow-md p-2 rounded-full hover:rotate-90 transition duration-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M11.25 3v2.25M11.25 18.75V21M4.22 4.22l1.6 1.6M17.18 17.18l1.6 1.6M3 11.25h2.25M18.75 11.25H21M4.22 18.28l1.6-1.6M17.18 6.82l1.6-1.6" />
+      </svg>
+    </button>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="fixed bottom-16 left-4 bg-white p-4 rounded-xl shadow-lg w-64 hidden text-sm space-y-4 z-50 border border-gray-200">
+      <h2 class="text-purple-700 font-semibold">Game Settings</h2>
+
+      <!-- Rapid Mode -->
+      <div class="flex items-center justify-between">
+        <label for="rapidToggle" class="text-gray-700">⏱ Rapid Mode</label>
+        <input type="checkbox" id="rapidToggle" class="accent-purple-600" />
+      </div>
+
+      <!-- Rapid Time Input -->
+      <div class="flex items-center gap-2">
+        <label for="rapidSeconds" class="text-gray-700">Time per move</label>
+        <input type="number" id="rapidSeconds" min="1" max="30" value="5"
+          class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" />
+        <span class="text-gray-500">s</span>
+      </div>
+
+      <!-- Reset Username -->
+      <button id="resetBtn" class="px-4 py-1 text-sm text-gray-600 border-gray-300 rounded-full shadow-sm hover:border-black transition">
+        🔁 Reset Usernames
+      </button>
+    </div>
 
 
     <script src="js/script3.js" type="module"></script>
