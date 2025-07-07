@@ -30,6 +30,7 @@ let gameMode = gameModeSelect.value;
 let gameActive = true;
 let winner = "";
 let moveHistory = []
+let prevWinner = ""
 console.log(moveHistory);
 
 
@@ -233,6 +234,7 @@ function endGame(winner, wasForfeit = false){
         draws.textContent = score.Draw;
     }
 
+    prevWinner = statusText.innerText
     saveToLocalStorage()
     saveHistoryToLocalStorage()
     newRoundBtn.disabled = false
@@ -289,7 +291,7 @@ function newRound() {
 }
 
 function saveHistoryToLocalStorage() {
-    localStorage.setItem("lastRound", JSON.stringify({winner, moves: moveHistory}))
+    localStorage.setItem("lastRound", JSON.stringify({prevWinner, moves: moveHistory}))
 }
 
 function replayRound() {
@@ -312,10 +314,7 @@ function replayRound() {
 
         if (i === lastRound.moves.length - 1) {
         // After last move
-        statusText.textContent =
-            lastRound.winner === ""
-            ? "🤝 It was a draw!"
-            : `🏆 ${lastRound.winner === "X" ? "Player 1" : "Player 2"} won!`;
+        statusText.textContent =lastRound.prevWinner
         }
     }, delay);
     delay += 600; // Adjust speed
