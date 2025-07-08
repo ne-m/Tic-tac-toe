@@ -271,6 +271,7 @@ function resetGame(){
     resetStyles()
     updateBoard()
     showCurrentTurn()
+    scrollToTop()
     newRoundBtn.disabled = true
     replayRoundBtn.disabled = true
 }
@@ -288,6 +289,7 @@ function newRound() {
     showCurrentTurn()
     newRoundBtn.disabled = true // the new round button gets disabled after a new round is stared and when the game is midway
     replayRoundBtn.disabled = true
+    scrollToTop()
 }
 
 function saveHistoryToLocalStorage() {
@@ -295,6 +297,7 @@ function saveHistoryToLocalStorage() {
 }
 
 function replayRound() {
+    scrollToTop()
     const lastRound = JSON.parse(localStorage.getItem("lastRound"));
     if (!lastRound || !lastRound.moves) return;
 
@@ -334,6 +337,7 @@ confirmForfeit.addEventListener("click", () => {
   const opponent = currentPlayer === "X" ? "O" : "X";
   forfeitModal.classList.add("hidden");
   endGame(opponent, true); // true = forfeit
+  scrollToTop()
 });
 
 // Cancel forfeit
@@ -341,11 +345,12 @@ cancelForfeit.addEventListener("click", () => {
   forfeitModal.classList.add("hidden");
 });
 
-
-
 function resetStyles() {
   [p1Card, p2Card, drawsCard].forEach(card => {
     card.classList.remove('ring-4', 'ring-green-400', 'animate-pulse-once');
   });
 }
 
+function scrollToTop(){
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
