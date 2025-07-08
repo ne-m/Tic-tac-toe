@@ -3,6 +3,9 @@ import celebrateWin from "./confetti.js"
 const cells = document.querySelectorAll('.box');
 const statusText = document.getElementById('status');
 const gameModeSelect = document.getElementById('gameMode');
+const usernameSection = document.getElementById("usernameSection");
+const player1Input = document.getElementById("player1");
+const player2Input = document.getElementById("player2");
 
 const p1Card = document.getElementById('p1Card');
 const p2Card = document.getElementById('p2Card');
@@ -24,6 +27,12 @@ const cancelForfeit = document.getElementById("cancelForfeit");
 const errorSound = document.getElementById('errorSound');
 const winSound = document.getElementById('winSound');
 
+const settingsBtn = document.getElementById("openSettingsBtn");
+const settingsPanel = document.getElementById("settingsPanel");
+
+const countdownBarContainer = document.getElementById("countdownBarContainer");
+const countdownBar = document.getElementById("countdownBar");
+
 let board = Array(9).fill("");
 let currentPlayer = "X";
 let gameMode = gameModeSelect.value;
@@ -32,7 +41,12 @@ let winner = "";
 let moveHistory = []
 let prevWinner = ""
 console.log(moveHistory);
-
+let gameStarted = false;
+let players = { X: "Player 1", O: "Player 2" };
+let rapidMode = false;
+let rapidTimeLimit = 5000; // 5 seconds
+let rapidTimer;
+let countdownInterval;
 
 let score = JSON.parse(localStorage.getItem("scores")) || {
   X: 0,
@@ -45,14 +59,92 @@ loadScores()
 restartBtn.addEventListener('click', resetGame)
 newRoundBtn.addEventListener('click', newRound)
 replayRoundBtn.addEventListener("click", replayRound)
+player1Input.addEventListener("input", updatePlayerDisplay);
+player2Input.addEventListener("input", updatePlayerDisplay);
+document.getElementById("resetBtn").addEventListener("click", resetUsernames);
+
+
+const savedNames = JSON.parse(localStorage.getItem("usernames"));
+
+if (savedNames) {
+  player1Input.value = savedNames.X || "";
+  player2Input.value = savedNames.O || "";
+  updatePlayerDisplay();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadSavedGameMode();
+  gameMode = gameModeSelect.value;
+  loadUserData();
+  updatePlayerDisplay();
+  showCurrentTurn();
+});
+
+settingsBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  settingsPanel.classList.toggle("hidden");
+});
+
+// Auto-close settings panel when clicking outside
+document.addEventListener("click", (e) => {
+  const isClickInside = settingsPanel.contains(e.target) || settingsBtn.contains(e.target);
+
+  if (!isClickInside && !settingsPanel.classList.contains("hidden")) {
+    settingsPanel.classList.add("hidden");
+  }
+});
+
+// Saves game mode selection
+gameModeSelect.addEventListener('change', () => {
+  localStorage.setItem('gameMode', gameModeSelect.value);
+});
+
 
 gameModeSelect.addEventListener("change", (e) => {
-  gameMode = e.target.value;
-  resetGame();
+  const selectedMode = e.target.value;
+
+  if (selectedMode !== gameMode) {
+    gameMode = selectedMode;
+
+    if (gameMode === "pvc") {
+      player2Input.style.display = "none";
+      player2Input.value = "Computer";
+    } else {
+      player2Input.style.display = "block";
+      player2Input.value = "";
+    }
+
+    resetGame(); // ✅ Now only resets when mode actually changes
+  }
+
+  updatePlayerDisplay();
 });
 
 // newRoundBtn.style.cursor = newRoundBtn.disabled === true ? "not-allowed" : "pointer"
 // newRoundBtn.style.cursor = "not-allowed"
+
+// Rapid toggle mode
+document.getElementById("rapidToggle").addEventListener("change", (e) => {
+  rapidMode = e.target.checked;
+});
+
+// Time input
+document.getElementById("rapidSeconds").addEventListener("input", (e) => {
+  const seconds = parseInt(e.target.value);
+  rapidTimeLimit = isNaN(seconds) ? 5000 : seconds * 1000;
+});
+
+document.getElementById("rapidToggle").addEventListener("change", (e) => {
+  rapidMode = e.target.checked;
+  saveToLocalStorage(); 
+});
+
+document.getElementById("rapidSeconds").addEventListener("input", (e) => {
+  const seconds = parseInt(e.target.value);
+  rapidTimeLimit = isNaN(seconds) ? 5000 : seconds * 1000;
+  saveToLocalStorage();
+});
+
 
 cells.forEach((cell, index)=>{
     cell.addEventListener('click',()=>{
@@ -63,10 +155,18 @@ cells.forEach((cell, index)=>{
 showCurrentTurn()
 
 function handleMove(index){
+    // to start game logic on first move
+    if (!gameStarted) {
+        startGameFromFirstMove();
+    }
     if (!gameActive || board[index] !== "") {
         errorSound.play();
         return
     }
+
+    clearTimeout(rapidTimer);
+    clearInterval(countdownInterval);
+    countdownBarContainer.classList.add("hidden");
 
     board[index] = currentPlayer;
     updateBoard();
@@ -91,9 +191,177 @@ function handleMove(index){
     //If playing vs computer and its the computer's turn
     if (gameMode === "pvc" && currentPlayer === "O") {
         setTimeout(computerMove, 500); // Delay to mimic thinking
+    } else if (rapidMode) {
+        startRapidCountdown();
     }
     console.log(moveHistory)
+   
+
 } 
+
+function loadSavedGameMode() {
+  const savedMode = localStorage.getItem("gameMode");
+  if (savedMode) {
+    gameMode = savedMode;
+    gameModeSelect.value = savedMode;
+
+    // Update UI based on mode
+    if (savedMode === "pvc") {
+      player2Input.style.display = "none";
+      player2Input.value = "Computer";
+    } else {
+      player2Input.style.display = "block";
+    }
+  }
+}
+
+function startGameFromFirstMove() {
+    gameStarted = true;
+    
+    const p1 = player1Input.value.trim() || "Player 1";
+    const p2 = gameMode === "pvc" ? "Computer" : (player2Input.value.trim() || "Player 2");
+
+    players = {
+        X: p1,
+        O: p2
+    };
+    //saving username when game starts
+    localStorage.setItem("usernames", JSON.stringify(players));
+    updatePlayerDisplay();
+
+    // Set avatar for Player O (player 2 or computer)
+    const avatarO = document.getElementById("avatarO");
+    avatarO.src = (gameMode === "pvc")
+        ? "https://api.dicebear.com/9.x/bottts/svg?seed=Aneka"
+        : "https://api.dicebear.com/9.x/thumbs/svg?flip=false";
+
+    const avatarX = document.getElementById("avatarX");
+
+    // Save avatars
+    localStorage.setItem("avatars", JSON.stringify({
+        X: avatarX.src,
+        O: avatarO.src
+    }));
+
+    usernameSection.style.display = "none";
+    showCurrentTurn();
+
+    // Starting countdown for player X
+    if (rapidMode && currentPlayer == "X") {
+        startRapidCountdown();
+    }
+}
+
+function startRapidCountdown() {
+  clearTimeout(rapidTimer);
+  clearInterval(countdownInterval);
+
+  if (gameMode === "pvc" && currentPlayer === "O") return;
+
+  const totalDuration = rapidTimeLimit; // in ms
+  const startTime = Date.now();
+
+  // Show the countdown bar
+  countdownBarContainer.classList.remove("hidden");
+  countdownBar.style.width = "100%";
+
+  // Animate the bar shrinking
+  countdownInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const percent = Math.max(0, 100 - (elapsed / totalDuration) * 100);
+    countdownBar.style.width = `${percent}%`;
+  }, 100);
+
+  // Timer ends (player loses turn)
+  rapidTimer = setTimeout(() => {
+    clearInterval(countdownInterval);
+    countdownBarContainer.classList.add("hidden");
+
+    statusText.textContent = `⏳ ${players[currentPlayer]} took too long! Skipping turn.`;
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    showCurrentTurn();
+
+    if (gameMode === "pvc" && currentPlayer === "O") {
+      setTimeout(computerMove, 500);
+    } else {
+      startRapidCountdown(); // restart for next player
+    }
+  }, totalDuration);
+}
+
+function updatePlayerDisplay() {
+  const p1 = player1Input.value.trim() || "Player 1";
+  const p2 = gameMode === "pvc"
+    ? "Computer"
+    : (player2Input.value.trim() || "Player 2");
+
+  // Update names
+  document.getElementById("nameX").textContent = p1;
+  document.getElementById("nameO").textContent = p2;
+
+  // Update avatars
+  document.getElementById("avatarX").src = "https://api.dicebear.com/9.x/thumbs/svg?flip=false&seed=" + encodeURIComponent(p1);
+
+  document.getElementById("avatarO").src = gameMode === "pvc"
+    ? "https://api.dicebear.com/9.x/bottts/svg?seed=Aneka"
+    : "https://api.dicebear.com/9.x/thumbs/svg?flip=false&seed=" + encodeURIComponent(p2);
+}
+
+function loadUsernamesFromStorage() {
+  const savedNames = JSON.parse(localStorage.getItem("usernames"));
+  if (savedNames) {
+    players = savedNames;
+
+    if (player1Input) player1Input.value = players.X;
+    if (player2Input && gameMode === "pvp") player2Input.value = players.O;
+
+    updatePlayerDisplay();
+  }
+}
+
+//for username and score persistence
+function loadUserData() {
+  const savedNames = JSON.parse(localStorage.getItem("usernames"));
+  const savedAvatars = JSON.parse(localStorage.getItem("avatars"));
+  const savedScores = JSON.parse(localStorage.getItem("scores"));
+  const savedRapidMode = JSON.parse(localStorage.getItem("rapidMode"));
+  const savedRapidLimit = parseInt(localStorage.getItem("rapidTimeLimit"));
+
+  // Restore usernames
+  if (savedNames) {
+    players = savedNames;
+    if (player1Input) player1Input.value = players.X;
+    if (player2Input && gameMode === "pvp") player2Input.value = players.O;
+  }
+
+  // Restore avatars
+  if (savedAvatars) {
+    document.getElementById("avatarX").src = savedAvatars.X;
+    document.getElementById("avatarO").src = savedAvatars.O;
+  }
+
+  // Restore scores
+  if (savedScores) {
+    score = savedScores;
+    p1Wins.textContent = score.X;
+    p2Wins.textContent = score.O;
+    draws.textContent = score.Draw;
+  }
+
+  // Restore Rapid Mode
+  if (typeof savedRapidMode === "boolean") {
+    rapidMode = savedRapidMode;
+    document.getElementById("rapidToggle").checked = rapidMode;
+  }
+
+  if (!isNaN(savedRapidLimit)) {
+    rapidTimeLimit = savedRapidLimit;
+    document.getElementById("rapidSeconds").value = rapidTimeLimit / 1000;
+  }
+
+  updatePlayerDisplay();
+}
+
 
 function updateBoard() {
   cells.forEach((cell, index) => {
@@ -149,11 +417,11 @@ function checkFreeSpaces(){
 function showCurrentTurn() {
     if(!gameActive) return;
 
-    if (gameMode === "pvc" && currentPlayer === "O") {
-        statusText.textContent = "🔵 Computer's turn";
-    } else {
-        statusText.textContent = `${currentPlayer === "X" ? "🔴 Player 1" : "🔵 Player 2"}'s turn`;
-    }
+    const playerName = players[currentPlayer];
+    const playerColor = currentPlayer === "X" ? "🔴" : "🔵";
+
+    statusText.textContent = `${playerColor} ${playerName}'s turn`;
+    statusText.className = `${currentPlayer === 'X' ? 'text-red-600' : 'text-blue-600'} font-bold animate-pulse-once`;
 
     // if (currentPlayer === 'X') {
     //     statusText.innerText = "🔴 Player 1's Turn";
@@ -193,15 +461,22 @@ function endGame(winner, wasForfeit = false){
     // });
 
     resetStyles()
+    //get usernames
+    const p1Name = players.X || "Player 1";
+    const p2Name = players.O || (gameMode === "pvc" ? "Computer" : "Player 2");
 
     // Highlight winner
     if (winner === 'X') {
         p1Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
-        statusText.innerText = wasForfeit? "🔴 Player 1 Wins by Forfeit!": '🎉 Player 1 Wins!';
+        statusText.innerText = wasForfeit  
+            ? `🔴 ${p1Name} wins by forfeit!`
+            : `🎉 ${p1Name} wins!`;
         statusText.classList.add('text-red-600', 'animate-pulse-once');
     } else if (winner === 'O' && gameMode === 'pvp') {
         p2Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
-        statusText.innerText = wasForfeit ? '🔵 Player 2 Wins by Forfeit!' : '🎉 Player 2 Wins!';
+        statusText.innerText = wasForfeit
+            ? `🔵 ${p2Name} wins by forfeit!`
+            : `🎉 ${p2Name} wins!`;
         statusText.classList.add('text-blue-600', 'animate-pulse-once');
     } else if (winner === 'O' && gameMode === 'pvc'){
         p2Card.classList.add('ring-4', 'ring-green-400', 'animate-pulse-once');
@@ -233,16 +508,26 @@ function endGame(winner, wasForfeit = false){
         score.Draw++;
         draws.textContent = score.Draw;
     }
-
-    prevWinner = statusText.innerText
     saveToLocalStorage()
     saveHistoryToLocalStorage()
     newRoundBtn.disabled = false
     replayRoundBtn.disabled = false
+    clearTimeout(rapidTimer);
+    clearInterval(countdownInterval);
+    countdownBarContainer.classList.add("hidden");
+
 }
 
 function saveToLocalStorage() {
-    localStorage.setItem("scores", JSON.stringify(score))
+    localStorage.setItem("scores", JSON.stringify(score));
+    localStorage.setItem("usernames", JSON.stringify(players));
+    localStorage.setItem("avatars", JSON.stringify({
+        X: document.getElementById("avatarX").src,
+        O: document.getElementById("avatarO").src
+    }));
+
+    localStorage.setItem("rapidMode", JSON.stringify(rapidMode));
+    localStorage.setItem("rapidTimeLimit", rapidTimeLimit);
 }
 
 function loadScores() {
@@ -256,6 +541,7 @@ function resetGame(){
     score.X = 0;
     score.O = 0;
     score.Draw = 0;
+    gameStarted = false;
     saveToLocalStorage()
 
     // p1Wins.textContent = score.X;
@@ -271,10 +557,40 @@ function resetGame(){
     resetStyles()
     updateBoard()
     showCurrentTurn()
-    scrollToTop()
+    clearTimeout(rapidTimer);
+    clearInterval(countdownInterval);
+    countdownBarContainer.classList.add("hidden");
     newRoundBtn.disabled = true
     replayRoundBtn.disabled = true
+
+    // Show username section again
+    usernameSection.style.display = "block";
+
+    // Reset status text
+    statusText.textContent = "🎯 Enter usernames to start";
+
+    // Adjust Player 2 input field based on game mode
+    if (gameMode === "pvc") {
+        player2Input.style.display = "none";
+        player2Input.value = "Computer";
+    } else {
+        player2Input.style.display = "block";
+    }
+
+    loadUsernamesFromStorage();
 }
+
+function resetUsernames() {
+  if (confirm("Are you sure you want to clear saved usernames?")) {
+    localStorage.removeItem("usernames");
+    player1Input.value = "";
+    player2Input.value = "";
+    updatePlayerDisplay();
+
+    usernameSection.style.display = "block";
+  }
+}
+
 
 function newRound() {
     // console.log("new round");
@@ -293,18 +609,37 @@ function newRound() {
 }
 
 function saveHistoryToLocalStorage() {
-    localStorage.setItem("lastRound", JSON.stringify({prevWinner, moves: moveHistory}))
+    const roundHistory = {
+        prevWinner: statusText.innerText,
+        moves: moveHistory,
+        players: {
+            X: players.X,
+            O: players.O
+        }
+    };
+    localStorage.setItem("lastRound", JSON.stringify(roundHistory));
 }
 
 function replayRound() {
     scrollToTop()
     const lastRound = JSON.parse(localStorage.getItem("lastRound"));
-    if (!lastRound || !lastRound.moves) return;
+    if (!lastRound || !lastRound.moves || !lastRound.players) return;
+
+    // Restore previuos players
+    players = lastRound.players;
+
+    // Update avatar names
+    document.getElementById("nameX").textContent = players.X;
+    document.getElementById("nameO").textContent = players.O;
+    document.getElementById("nameX").textContent = players.X;
+    document.getElementById("nameO").textContent = players.O;
 
     // Reset board visually
     board = Array(9).fill("");
     updateBoard();
     gameActive = false;
+    gameStarted = true;
+
     statusText.textContent = "🔁 Replaying last round...";
     replayRoundBtn.disabled = true;
 
@@ -317,7 +652,7 @@ function replayRound() {
 
         if (i === lastRound.moves.length - 1) {
         // After last move
-        statusText.textContent =lastRound.prevWinner
+        statusText.textContent =lastRound.prevWinner;
         }
     }, delay);
     delay += 600; // Adjust speed
