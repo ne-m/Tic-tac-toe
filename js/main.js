@@ -680,3 +680,17 @@ function resetStyles() {
 function scrollToTop(){
     window.scrollTo({ top: 254, behavior: 'smooth' });
 }
+
+const toggleBtn = document.getElementById("creatorToggle");
+const panel = document.getElementById("creatorPanel");
+
+toggleBtn.addEventListener("click", () => {
+  panel.classList.toggle("hidden");
+});
+
+// Optional: Click outside to close
+document.addEventListener("click", (e) => {
+  if (!toggleBtn.contains(e.target) && !panel.contains(e.target)) {
+    panel.classList.add("hidden");
+  }
+});
