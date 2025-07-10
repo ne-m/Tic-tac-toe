@@ -22,6 +22,7 @@
     >
       🎨
     </button>
+
     <main class="container  bg-white/30 backdrop-blur-md border border-white/20 shadow-2xl  max-w-md">
       <!-- Game Title -->
       <header>
@@ -214,6 +215,7 @@
     <!-- Audio preload-->
     <audio id="winSound" src="sounds/win.wav" preload="auto"></audio>
     <audio id="errorSound" src="sounds/error.mp3" preload="auto"></audio>
+    <audio  id="backgroundMusic" src="sounds/bgMusic.mp3" preload="auto" loop autoplay></audio>
 
     <!-- forfeit modal -->
     <!-- Forfeit Confirmation Modal -->
@@ -253,6 +255,11 @@
           class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" />
         <span class="text-gray-500">s</span>
       </div>
+
+          <!-- sound player -->
+    <button id="musicToggle" class="flex flex-row rounded-full shadow-lg hover:scale-105 transition p-2">
+      <span> <img src="images/sound.svg" alt="" class="h-5"> </span>
+    </button>
 
       <!-- Reset Username -->
       <button id="resetBtn" class="px-4 py-1 text-sm text-gray-600 border-gray-300 rounded-full shadow-sm hover:border-black transition">

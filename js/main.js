@@ -26,9 +26,11 @@ const cancelForfeit = document.getElementById("cancelForfeit");
 
 const errorSound = document.getElementById('errorSound');
 const winSound = document.getElementById('winSound');
+const backgroundMusic = document.getElementById("backgroundMusic");
 
 const settingsBtn = document.getElementById("openSettingsBtn");
 const settingsPanel = document.getElementById("settingsPanel");
+const musicBtn = document.getElementById("musicToggle")
 
 const countdownBarContainer = document.getElementById("countdownBarContainer");
 const countdownBar = document.getElementById("countdownBar");
@@ -46,6 +48,7 @@ let rapidMode = false;
 let rapidTimeLimit = 5000; // 5 seconds
 let rapidTimer;
 let countdownInterval;
+backgroundMusic.volume = 0.1
 
 let score = JSON.parse(localStorage.getItem("scores")) || {
   X: 0,
@@ -694,3 +697,15 @@ document.addEventListener("click", (e) => {
     panel.classList.add("hidden");
   }
 });
+
+musicBtn.addEventListener("click", ()=>{
+  musicBtn.classList.toggle("mute")
+
+  if (musicBtn.classList.contains("mute")){
+    backgroundMusic.muted = true
+    musicBtn.innerHTML = '<span><img src="./images/mute.svg" alt="Sound on" class="h-5"></span>'
+  } else {
+    backgroundMusic.muted = false
+    musicBtn.innerHTML = '<span><img src="./images/sound.svg" alt="Muted" class="h-5"></span>'
+  }
+})

@@ -11,7 +11,7 @@ A two-player web-based game where players take turns making a 3x3 grid. The firs
 - ⚡Rapid mode (timed moves)
 - 👥Set player usernames
 - 📊 Scoreboard tracks wins, losses, and draws
-- 🔊 Win/loss sounds and confetti animation on victory
+- 🔊 Win/loss sounds, background music and confetti animation on victory
 
 ## Technologies Used 
 - HTML
@@ -34,6 +34,8 @@ Tic-tac-toe/
 │                 
 ├──images/
 │   ├── favicon.ico  
+│   ├── mute.svg
+│   └── sound.svg
 │         
 ├── js/             
 │   ├── script.js         
@@ -48,8 +50,7 @@ Tic-tac-toe/
 │   └── errorSound.mp3    
 │
 ├── dashboard.html
-├── index.html                          
-├── idx.html                      
+├── index.html                                             
 ├── output.css                              
 ├── package-lock.json              
 ├── postcss.config.js               
